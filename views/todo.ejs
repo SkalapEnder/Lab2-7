@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body{
+            background-color: #dbdbdb;
+        }
+        tr, th, td{
+            border: 1px solid rgb(199, 199, 199);
+        }
+        th.description-column, td.description-column {
+            width: 250px;
+            max-height: 50px;
+            min-height: 50px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<%- include('templates/navbar'); %>
+<div class="container bg-white shadow rounded w-50 mt-3 text-center p-5">
+    <h1>Your ToDo List</h1>
+    <form action="/todo" method="POST" class="mt-3">
+        <div class="d-flex justify-content-center">
+            <div class="form-floating mb-3 me-3 w-50  mx-auto">
+                <input type="text" class="form-control" id="title" placeholder="Title" name="title">
+                <label for="title">Title</label>
+            </div><br>
+            <div class="form-floating mb-3 me-3 w-75 mx-auto">
+                <textarea class="form-control" placeholder="Task's description" id="description" name="description" style="max-height: 150px" required></textarea>
+                <label for="description">Description</label>
+            </div><br>
+        </div>
+        <button type="submit" class="btn btn-outline-success">Add Task</button>
+    </form>
+</div>
+
+<div class="container bg-white shadow rounded w-75 my-5  text-center p-5">
+    <h2>Tasks:</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width: 40px;">User ID</th>
+            <th style="width: 30px;">Title</th>
+            <th style="width: 250px;">Description</th>
+            <th style="width: 50px;">Is Done?</th>
+            <th style="width: 140px;">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+            <% tasks.forEach(function(task) { %>
+                <tr style="height: 50px;" data-task-id="<%= task._id %>">
+                    <td><%= task.user_id %></td>
+                    <td><input type="text" class="task-title" value="<%= task.title %>"></td>
+                    <td class="description-column"><textarea class="task-description" style="width: 100%"><%= task.description %></textarea></td>
+                    <td><input type="checkbox" style="width: 30px; height: 30px" class="task-is-done" <%= task.is_done ? 'checked' : '' %>></td>
+                    <td>
+                        <div>
+                            <button class="btn btn-outline-secondary mb-3" onclick="updateTask('<%= task._id %>')">Update Task</button>
+                            <button class="btn btn-outline-danger mb-3" onclick="deleteTask('<%= task._id %>')">Delete Task</button>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+</div>
+
+<%- include('templates/footer'); %>
+</body>
+<script>
+    async function updateTask(taskId) {
+        try {
+            const taskRow = document.querySelector(`[data-task-id="${taskId}"]`);
+
+            const title = taskRow.querySelector('.task-title').value;
+            const description = taskRow.querySelector('.task-description').value;
+            const is_done = taskRow.querySelector('.task-is-done').checked;
+
+            const response = await fetch(`/todo/put/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, is_done }),
+            });
+
+            if (response.ok) {
+                alert('Task was updated');
+                window.location.reload();
+            } else {
+                console.error('Failed to update task');
+                alert('Error updating task: Response is NOT Ok');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating task: ' + error);
+        }
+    }
+
+        // Delete a task
+    async function deleteTask(taskId) {
+        try {
+            const response = await fetch(`/todo/delete/${taskId}`, {method: 'DELETE'});
+
+            if (response.ok) {
+                alert('Task Was Deleted');
+                window.location.reload();
+            } else {
+                alert('Error deleting task');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error deleting task');
+        }
+    }
+</script>
+</html>

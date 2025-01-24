@@ -1,0 +1,3 @@
+    mongodb+srv://skalap2endra:kGOM7z5V54vBFdp1@cluster0.vannl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+ff63d7fe7d4cb794a5b97a0708e560b9c015fb59a4a0e85dbf1d11a47f14ed32
