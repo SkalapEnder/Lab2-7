@@ -40,19 +40,17 @@ app.use('/', taskRouter);
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-const convertData = (isoDate) => {
-    const date = new Date(isoDate);
-    const options = {
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: true,
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC',
-    };
-    return date.toLocaleString('ru-RU', options);
-};
+function convertData(timestamp) {
+    const date = new Date(Date.parse(timestamp));
+
+    const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    const day = date.getDate();
+    const month = date.toLocaleString('en-GB', { month: 'long' });
+    const year = date.getFullYear();
+
+    return `${time}, ${day} ${month}, ${year}`;
+}
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
