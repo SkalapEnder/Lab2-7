@@ -77,6 +77,24 @@ router.get('/logout', (req, res) => {
     });
 });
 
+router.get('/profile', async (req, res) => {
+    if (req.session.userId === undefined) {
+        return res.redirect('/login');
+    }
+
+    const user = await getUser(req.session.userId);
+    if (user === null) {
+        return res.render('error', {errorMessage: 'User not found'});
+    }
+    return res.render('profile', {user});
+})
+
+async function getUser(id){
+    const user = await User.findOne({ user_id: id });
+    if (user === null) return null;
+    return user;
+}
+
 async function getNextFreeUserId() {
     try {
         const lastUser = await User.findOne().sort({ user_id: -1 });
@@ -89,6 +107,5 @@ async function getNextFreeUserId() {
         throw new Error('Failed to retrieve next free user ID');
     }
 }
-
 
 module.exports = router;

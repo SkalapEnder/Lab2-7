@@ -38,3 +38,19 @@ app.use('/', authRouter);
 app.use('/', taskRouter);
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+const convertData = (isoDate) => {
+    const date = new Date(isoDate);
+    const options = {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+    };
+    return date.toLocaleString('ru-RU', options);
+};
+
+app.locals.convertData = convertData;

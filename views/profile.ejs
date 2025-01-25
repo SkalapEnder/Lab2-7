@@ -27,8 +27,8 @@
 
     <div>
         <h3>Profile data info</h3>
-        <h4>Created: ${convertData(<%= user.created_at %>)}</h4>
-        <h4>Updated: ${convertData(<%= user.updated_at %>)} %></h4>
+        <h4>Created: <%= convertData(user.created_at) %></h4>
+        <h4>Updated: <%= convertData(user.updated_at) %></h4>
     </div>
 </div>
 

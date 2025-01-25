@@ -4,7 +4,11 @@
             <ul class="navbar-nav ">
                 <li class="nav-item d-flex">
                     <a class="nav-link active" href="/todo">ToDo</a>
-                    <% if (isLoggedIn) { %> <a class="nav-link" href="/logout">Log Out</a> <% } %>
+                    <% if (isLoggedIn) { %>
+                        <a class="nav-link" href="/profile">Profile</a>
+                    <% } else { %>
+                        <a class="nav-link" href="/login">Log In</a>
+                    <% } %>
                 </li>
             </ul>
     </div>
