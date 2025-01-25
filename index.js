@@ -27,7 +27,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    res.locals.isLoggedIn = req.session.isLoggedIn || false; // Pass login status to templates
+    res.locals.isLoggedIn = req.session.isLoggedIn || false;
+    res.locals.username = req.session.username || 'Guest';
     next();
 });
 
@@ -53,4 +54,9 @@ const convertData = (isoDate) => {
     return date.toLocaleString('ru-RU', options);
 };
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 app.locals.convertData = convertData;
+app.locals.capitalizeFirstLetter = capitalizeFirstLetter;

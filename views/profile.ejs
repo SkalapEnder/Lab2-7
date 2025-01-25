@@ -17,18 +17,34 @@
 <div class="container bg-white shadow rounded w-50 mt-4 text-center p-5 pb-4">
     <h1>Profile Page</h1>
     <div class="profile-image">
-        <img src="https://eu.ui-avatars.com/api/?name=${<%= user.username %>}&size=250" alt="Profile Picture" />
+        <img src="https://eu.ui-avatars.com/api/?name=<%= user.username %>&size=150" class="rounded-circle" alt="Profile Picture" />
     </div>
 
-    <h3>User ID: <%= user.user_id %></h3>
-    <h3>Name: <%= user.username %></h3>
-    <h3>Email: <%= user.email %></h3>
-    <h3>Role: <%= user.role %></h3>
+    <div class="d-flex justify-content-around mt-4">
+        <div>
+            <h3>User ID: <%= user.user_id %></h3>
+            <h3>Name: <%= user.username %></h3>
+            <h3>Email: <%= user.email %></h3>
+            <h3>Role: <%= capitalizeFirstLetter(user.role) %></h3>
+        </div>
+        <br>
+        <div>
+            <h3>Profile data info</h3>
+            <h4>Created: <%= convertData(user.created_at) %></h4>
+            <h4>Updated: <%= convertData(user.updated_at) %></h4>
+        </div>
+    </div>
 
-    <div>
-        <h3>Profile data info</h3>
-        <h4>Created: <%= convertData(user.created_at) %></h4>
-        <h4>Updated: <%= convertData(user.updated_at) %></h4>
+    <div class="mt-4 mx-auto">
+        <form action="/update" method="GET" style="display: inline;">
+            <button type="submit" class="btn btn-outline-success fs-5">Update User</button>
+        </form>
+        <form action="/logout" method="GET" style="display: inline;">
+            <button type="submit" class="btn btn-outline-secondary fs-5">Log Out</button>
+        </form>
+        <form action="/delete-account" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-outline-danger fs-5">Delete Account</button>
+        </form>
     </div>
 </div>
 

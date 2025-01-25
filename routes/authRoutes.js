@@ -24,6 +24,7 @@ router.post('/register', async (req, res) => {
         return res.render('error', { errorMessage: 'Invalid secret code' });
     }
 
+    // Find new free ID from collection (starts from 0)
     const userId = await getNextFreeUserId();
     if (isNaN(userId)) {
         throw new Error('Failed to generate a valid user_id');
@@ -53,21 +54,75 @@ router.get('/login', (req, res) => {
     res.render('login');
 });
 
-// Route to handle user login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username: username });
 
-    if (user === null || password !== user.password) {
-        return res.send('Invalid login credentials');
+    if (user === null) {
+        return res.render('error', {errorMessage: 'User not found'});
+    }
+    if (password !== user.password){
+        return res.render('error', {errorMessage: 'Invalid password'});
     }
 
     req.session.userId = user.user_id;
+    req.session.username = user.username;
     req.session.isLoggedIn = true;
     res.redirect('todo');
 });
 
-// Route to handle logout
+// UPDATE part
+router.get('/update', async (req, res) => {
+    if (req.session.userId === undefined) {
+        return res.redirect('/login');
+    }
+
+    const user = await getUser(req.session.userId);
+    if (user === null) {
+        return res.render('error', {errorMessage: 'User not found'});
+    }
+    res.render('update', {user});
+})
+
+router.post('/update', async (req, res) => {
+    if (req.session.userId === undefined) {
+        return res.redirect('/login');
+    }
+
+    const { username, email, role, secret_code } = req.body;
+
+    if (role === 'admin' && secret_code === null) {
+        return res.render('error', {errorMessage: 'Secret code is required for admins'});
+    }
+
+    try {
+        const updateData = {
+            username: username,
+            email: email,
+            role: role };
+        if (role === 'admin') {
+            if (secret_code !== adminCode) {
+                return res.render('error', {errorMessage: 'Invalid secret code'});
+            }
+        }
+
+        const user_id = req.session.userId;
+        const updatedUser = await User.findOneAndUpdate(
+            {user_id: user_id},
+            {$set: updateData}
+        );
+        if (updatedUser === null) {
+            return res.render('error', {errorMessage: 'Error updating user'});
+        }
+        req.session.username = username;
+        res.redirect('/profile');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error updating user.');
+    }
+});
+
+// LOG OUT part
 router.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -75,6 +130,25 @@ router.get('/logout', (req, res) => {
         }
         res.redirect('/');
     });
+});
+
+router.post('/delete-account', async (req, res) => {
+    if (req.session.userId === undefined) {
+        return res.redirect('/');
+    }
+
+    const userId = req.session.userId;
+
+    try {
+        const deletedUser = await User.findOneAndDelete({ user_id: userId });
+        if (deletedUser === null) {
+            return res.render('error', {errorMessage: 'User not found or not deleted'});
+        }
+        req.session.destroy();
+        res.redirect('/');
+    } catch (err) {
+        return res.render('error', {errorMessage: err});
+    }
 });
 
 router.get('/profile', async (req, res) => {
