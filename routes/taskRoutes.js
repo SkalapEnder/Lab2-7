@@ -1,5 +1,6 @@
 const express = require('express');
 const Task = require('../models/Task');
+const User = require('../models/User');
 const mongoose = require("mongoose");
 const {ObjectId} = require("mongodb");
 const router = express.Router();
@@ -100,6 +101,25 @@ router.delete('/todo/delete/:id', async (req, res) => {
         return res.status(200).send('Task was deleted');
     } catch (err) {
         console.error('Error deleting task:', err);
+        throw err;
+    }
+});
+
+router.delete('/todo/delete-user/:id', async (req, res) => {
+    if (req.session.userId === undefined) {
+        return res.redirect('/login');
+    }
+
+    const id = parseInt(req.params.id);
+
+    try {
+        const tasks = await User.deleteMany({ user_id: id });
+        if(tasks === null){
+            return res.status(401).send('Relevant tasks was NOT deleted');
+        }
+        return res.status(200).send('Tasks was deleted');
+    } catch (err) {
+        console.error('Error deleting tasks:', err);
         throw err;
     }
 });

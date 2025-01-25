@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Task = require('../models/Task');
 const mongoose = require("mongoose");
 const router = express.Router();
 const adminCode = 'admin1243'
@@ -140,10 +141,17 @@ router.post('/delete-account', async (req, res) => {
     const userId = req.session.userId;
 
     try {
+        const response = await Task.deleteMany({ user_id: userId });
+
+        if (response === null) {
+            console.error(`Failed to delete tasks.`);
+        }
+
         const deletedUser = await User.findOneAndDelete({ user_id: userId });
         if (deletedUser === null) {
             return res.render('error', {errorMessage: 'User not found or not deleted'});
         }
+
         req.session.destroy();
         res.redirect('/');
     } catch (err) {
