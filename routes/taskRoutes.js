@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const {ObjectId} = require("mongodb");
 const router = express.Router();
 
-mongoose.connect('mongodb+srv://skalap2endra:kGOM7z5V54vBFdp1@cluster0.vannl.mongodb.net/lab1_7?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Task: Connected to MongoDB Atlas'))
     .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 

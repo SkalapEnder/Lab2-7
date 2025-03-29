@@ -1,12 +1,11 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Task = require('../models/Task');
 const mongoose = require("mongoose");
 const router = express.Router();
 const adminCode = 'admin1243'
 
-mongoose.connect('mongodb+srv://skalap2endra:kGOM7z5V54vBFdp1@cluster0.vannl.mongodb.net/lab1_7?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Auth: Connected to MongoDB Atlas'))
     .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
@@ -49,9 +48,6 @@ router.post('/register', async (req, res) => {
 
 // LOGIN
 router.get('/login', (req, res) => {
-    if (req.session.userId !== undefined) {
-        return res.redirect('/todo');
-    }
     res.render('login');
 });
 
@@ -62,7 +58,7 @@ router.post('/login', async (req, res) => {
     if (user === null) {
         return res.render('error', {errorMessage: 'User not found'});
     }
-    if (password !== user.password){
+    if (!(await bcrypt.compare(password, user.password))){
         return res.render('error', {errorMessage: 'Invalid password'});
     }
 
